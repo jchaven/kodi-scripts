@@ -25,23 +25,23 @@ SCRIPT=`basename "$0"`                     # get name of this script
 GetVideos(){
 
   # create single list of all videos in specific folders (array not supported)
-  echo "$(date)|INFO|Processing directory: $1" >> "$LOGFILE"
-  find -L "$1" -type f \( -iname "*.*" ! -iname "*.srt" ! -iname "*.jpg" ! -iname "*.nfo" ! -iname "*.tbn" ! -iname "*.png" \) >> $OUTFILE0
+  #echo "$(date)|INFO|Processing directory: $1" >> "$LOGFILE"
+  find -L "$1" -type f \( -iname "*.*" ! -iname "*.srt" ! -iname "*.jpg" ! -iname "*.nfo" ! -iname "*.txt" ! -iname "*.tbn" ! -iname "*.png" \) >> $OUTFILE0
 
-  # output 20 rows of videos in random order to new file - this is an attempt to get around
+  # output 15 rows of videos in random order to new file - this is an attempt to get around
   # shows that have few episodes and shows that have many episodes to prevent a playlist that
   # has too many episodes of one particular show.
-  echo "$(date)|INFO|Pull 20 random videos from work file and add to list file" >> "$LOGFILE"
+  echo "$(date)|INFO|Pull 15 random videos from: $1" >> "$LOGFILE"
   awk 'BEGIN{srand(); }
   { a[NR]=$0 }
   END{
-    for(i=1; i<=20; i++){
+    for(i=1; i<=15; i++){
       x=int(rand()*NR) + 1; print a[x];
     }
   }' $OUTFILE0 >> $OUTFILE1
 
   # Delete work file
-  echo "$(date)|INFO|Deleting work file" >> "$LOGFILE"
+  #echo "$(date)|INFO|Deleting work file" >> "$LOGFILE"
   rm $OUTFILE0
 
 }
@@ -66,37 +66,48 @@ else
   # START PROCESSING
   echo "$(date)|INFO|Building a list of all videos in specific directories" >> "$LOGFILE"
   # create single list of all videos in specific folders (array not supported)
-  GetVideos "/storage/nas/temp/TV/Grand Designs"
-  GetVideos "/storage/nas/temp/TV/Grand Designs New Zealand"
-  GetVideos "/storage/nas/temp/TV/Tiny House Nation"
   GetVideos "/storage/nas/media/Other/Home and Garden/Big Dreams Small Spaces"
   GetVideos "/storage/nas/media/Other/Home and Garden/Gardeners' World"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Grow Your Own at Home with Alan Titchmarsh"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs New Zealand"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Grow Your Own at Home"
   GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Garden"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Gardeners' World"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Homegrown"
   GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Home and Garden"
   GetVideos "/storage/nas/media/Other/Home and Garden/This Old House"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Tiny Houses"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Monty Don's Gardens"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Various Design"  
+  GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs - The Streets"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Queer Eye"
+  
+
+  # get number of lines in outfile
+  LINES=$(wc -l < "$OUTFILE1")
+  echo "$(date)|INFO|Created list file containing $LINES lines." >> "$LOGFILE"
 
   # remove duplicate lines - without sorting
   #sort -u -o $OUTFILE1 $OUTFILE1
   awk '!a[$0]++' $OUTFILE1 > $OUTFILE0
 
-  # output 200 rows of videos in random order to new file
-  echo "$(date)|INFO|Pull 150 random videos from the list into a new file" >> "$LOGFILE"
+  # output 100 rows of videos in random order to new file
+  echo "$(date)|INFO|Pull 100 random videos from the list into a new file" >> "$LOGFILE"
   awk 'BEGIN{srand(); }
   { a[NR]=$0 }
   END{
-    for(i=1; i<=150; i++){
+    for(i=1; i<=100; i++){
       x=int(rand()*NR) + 1; print a[x];
     }
   }' $OUTFILE0 > $OUTFILE2
 
 
-  # output 50 rows from new file to playlist
-  echo "$(date)|INFO|Pull 50 random videos from the new list into the final playlist" >> "$LOGFILE"
+  # output 75 rows from new file to playlist
+  echo "$(date)|INFO|Pull 75 random videos from the new list into the final playlist" >> "$LOGFILE"
   awk 'BEGIN{srand(); }
   { a[NR]=$0 }
   END{
-    for(i=1; i<=50; i++){
+    for(i=1; i<=75; i++){
       x=int(rand()*NR) + 1; print a[x];
     }
   }' $OUTFILE2 > $OUTFILE0

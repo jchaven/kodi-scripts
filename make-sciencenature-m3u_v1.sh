@@ -25,13 +25,13 @@ SCRIPT=`basename "$0"`                     # get name of this script
 GetVideos(){
 
   # create single list of all videos in specific folders (array not supported)
-  echo "$(date)|INFO|Processing directory: $1" >> "$LOGFILE"
+  #echo "$(date)|INFO|Processing directory: $1" >> "$LOGFILE"
   find -L "$1" -type f \( -iname "*.*" ! -iname "*.srt" ! -iname "*.jpg" ! -iname "*.nfo" ! -iname "*.tbn" ! -iname "*.png" \) >> $OUTFILE0
 
   # output 10 rows of videos in random order to new file - this is an attempt to get around
   # shows that have few episodes and shows that have many episodes to prevent a playlist that
   # has too many episodes of one particular show.
-  echo "$(date)|INFO|Pull 10 random videos from work file and add to list file" >> "$LOGFILE"
+  echo "$(date)|INFO|Pull 10 random videos from: $1" >> "$LOGFILE"
   awk 'BEGIN{srand(); }
   { a[NR]=$0 }
   END{
@@ -70,11 +70,15 @@ else
 
   # Loop through a master directory and process each subdirectory
   SOURCE_DIR="/storage/nas/media/Other/Science and Nature"
-  echo "$(date)|INFO|Processing source directory $SOURCE_DIR" >> "$LOGFILE"
+  #echo "$(date)|INFO|Processing source directory $SOURCE_DIR" >> "$LOGFILE"
   for dir in $(find $SOURCE_DIR -type d -mindepth 1 -maxdepth 1)
   do
     GetVideos "$dir"
   done
+
+  # get number of lines in outfile
+  LINES=$(wc -l < "$OUTFILE1")
+  echo "$(date)|INFO|Created list file containing $LINES lines." >> "$LOGFILE"
 
   # remove duplicate lines - without sorting
   #sort -u -o $OUTFILE1 $OUTFILE1
