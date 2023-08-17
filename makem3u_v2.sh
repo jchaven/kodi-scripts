@@ -23,30 +23,23 @@ VIDEOLIMIT=3    # number of videos to play between bumpers
 # file locations (from Kodi perspective)
 BUMPER_LIST="/storage/nas/media/admin/mtv_bumpers.txt"
 VIDEO_LIST="/storage/nas/media/admin/mtv_videos.txt"
-VIDEO_PATH="/var/media/USB128/Music Videos"
-
-LOGFILE="/storage/temp/make-musicvideo-m3u.log"
-OUTFILE="/storage/temp/out.txt"
+VIDEO_PATH="/storage/nas/media/Everyone/Music Videos"
+OUTFILE="/storage/temp/musicvideo-work.txt"
+PLAYLIST="/storage/.kodi/userdata/playlists/video/Music Videos.m3u"
+LOGFILE="/storage/temp/make-musicvideo-m3u_v2.log"
 LOCKFILE="/storage/temp/make-musicvideo-m3u.lock"
-PLAYLIST="/storage/.kodi/userdata/playlists/video/MusicVideos.m3u"
+SCRIPT=`basename "$0"`                     # get name of this script
+
 
 #------------------------------------------------------------------
 # FUNCTIONS
 #------------------------------------------------------------------
-GetBumper(){
-  $(awk '
-    BEGIN{ srand() } 
-    rand() * NR < 1 { 
-        line = $0 
-    } 
-    END { print line }' $BUMPERS)
 
-}
 
 #------------------------------------------------------------------
-# START
+# PROCESS
 #------------------------------------------------------------------
-echo $(date)"|INFO|Start building playlist: $PLAYLIST" > $LOGFILE
+echo "$(date)|INFO|Starting script: $SCRIPT" >> "$LOGFILE"
 
 # if lock file exists something is wrong - abort
 if [ -f "$LOCKFILE" ]; then
@@ -56,90 +49,89 @@ if [ -f "$LOCKFILE" ]; then
 
 else    
   echo "$(date)|INFO|Lock file not found. Continuing." >> "$LOGFILE"
+  echo $(date)"|INFO|Start building playlist: $PLAYLIST" > $LOGFILE
   
   # create lock file
   echo 'This file should not exist for more than a few minutes.' > "$LOCKFILE"
 
+  # delete old playlist
+  echo $(date)"|INFO|Deleting old playlist file: $PLAYLIST" >> $LOGFILE
+  rm "$PLAYLIST"
+
   # start creating new playlist
   while [  $FILECOUNT -lt $FILELIMIT ]; do
-
-    # get a random bumper and create file
+    #echo $(date)"|INFO|File count: "$FILECOUNT >> $LOGFILE
+    
+    # get a single random bumper and create file
     #shuf -n 1 $BUMPERS >> $OUTFILE
     #a=$(shuf -n 1 $BUMPERS)
-
     # "shuf" not supported in LibreElec - use awk
-    a=$(awk '
-    BEGIN{ srand() } 
+    a=$(awk -v seed=$RANDOM '
+    BEGIN{ srand(seed) } 
     rand() * NR < 1 { 
         line = $0 
     } 
-    END { print line }' $BUMPERS)
+    END { print line }' $BUMPER_LIST)
 
-    # check if file exists
-    f="$VIDEO_PATH/$a"
-    if [ -e "$f" ]; then
-
-        # add entry to playlist
-        echo $(date)"|INFO|Adding bumper $a" >> $LOGFILE
-
-        # append new line with new path to playlist
-        echo $f >> $OUTFILE
-    else
-        echo $(date)"|ERROR|File not found: $f" >> $LOGFILE
-    fi
+    # add entry to playlist
+    echo $(date)"|INFO|Adding bumper: $a" >> $LOGFILE
+    echo $VIDEO_PATH/$a >> $OUTFILE
 
 
-    # output multiple rows of random videos to file
     # get multiple random lines from file list
     #shuf -n $VIDEOLIMIT $VIDEOS >> $OUTFILE
-
-    # get just filename from file list and prepend player's local path
+    # "shuf" not supported in LibreElec - use awk 3x in while loop
     while [  $ROWCOUNT -lt $VIDEOLIMIT ]; do
+    #echo $(date)"|INFO|Row count: "$ROWCOUNT >> $LOGFILE
     #for i in {1..$VIDEOLIMIT}
     #do
         # get single random line from file list
-        a=$(shuf -n 1 $VIDEOS)
+        a=$(awk -v seed=$RANDOM '
+        BEGIN{ srand(seed) } 
+        rand() * NR < 1 { 
+            line = $0 
+        } 
+        END { print line }' $VIDEO_LIST)
 
-        # strip-off path
-        b=$(basename "$a")
-
-        # check if file exists
-        f="$NASPATH/$b"
-        if [ -e "$f" ]; then
-
-            # add entry to playlist
-            echo $(date)"|INFO|Adding music video $a" >> $LOGFILE
-            echo $LOCALPATH/$b >> $OUTFILE
-
-        else
-            echo $(date)"|ERROR|File not found: $f" >> $LOGFILE
-        fi
+        # add entry to playlist
+        echo $(date)"|INFO|Adding music video: $a" >> $LOGFILE
+        echo $VIDEO_PATH/$a >> $OUTFILE
 
         # increment file limit counter
         let ROWCOUNT=ROWCOUNT+1
 
     done
+
     # reset row counter
     ROWCOUNT=0
 
     # increment file limit counter
     let FILECOUNT=FILECOUNT+1
-done
 
-# copy new playlist to XBMC - /storage/.kodi/userdata/playlists/video
-echo $(date)"|INFO|Copying playlist to XBMC2" >> $LOGFILE
-cp $OUTFILE $PLAYLIST
+  done
 
-# delete temp file
-echo $(date)"|INFO|Deleting temp file: $OUTFILE" >> $LOGFILE
-rm $OUTFILE
+  # Finish up
+
+  # copy outfile to playlist removing lines with "-----" (separater for favorites)
+  echo $(date)"|INFO|Copying outfile to playlist" >> $LOGFILE
+  sed '/---/d' $OUTFILE > $PLAYLIST
+  
+  # get number of lines in playlist
+  LINES=$(wc -l < "$PLAYLIST")
+  echo "$(date)|INFO|Created playlist containing $LINES lines." >> "$LOGFILE"
+
+  # delete temp files
+  echo $(date)"|INFO|Deleting temp file: $OUTFILE" >> $LOGFILE
+  rm $OUTFILE
+  echo $(date)"|INFO|Deleting lock file: $LOCKFILE" >> $LOGFILE
+  rm $LOCKFILE
+
+fi
+
+echo "$(date)|INFO|Processing complete. Restoring file system separator" >> "$LOGFILE"
 
 # restore IFS
 IFS=$OLDIFS
 
-echo "$(date)|INFO|Finished running script. Exiting" >> "$LOGFILE"
+echo "$(date)|INFO|Exiting script" >> "$LOGFILE"
 exit
-
-
-
-
