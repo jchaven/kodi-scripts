@@ -79,9 +79,10 @@ else
   GetVideos "/storage/nas/media/Other/Home and Garden/Tiny Houses"
   GetVideos "/storage/nas/media/Other/Home and Garden/Monty Don's Gardens"
   GetVideos "/storage/nas/media/Other/Home and Garden/Various Design"  
-  GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs - The Streets"
+  #GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs - The Streets"
   GetVideos "/storage/nas/media/Other/Home and Garden/Queer Eye"
-  
+  GetVideos "/storage/nas/media/Other/Home and Garden/My Yard Goes Disney"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Kill Your Lawn"
 
   # get number of lines in outfile
   LINES=$(wc -l < "$OUTFILE1")
