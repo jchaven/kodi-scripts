@@ -22,6 +22,14 @@ LOCKFILE="/storage/temp/make-nightflight-m3u_v3.lock"
 SCRIPT=`basename "$0"`                     # get name of this script
 
 
+#------------------------------------------------------------------
+# FUNCTIONS
+#------------------------------------------------------------------
+
+
+#------------------------------------------------------------------
+# PROCESS
+#------------------------------------------------------------------
 echo "$(date)|INFO|Starting script: $SCRIPT" >> "$LOGFILE"
 
 # if lock file exists something is wrong - abort
@@ -32,15 +40,19 @@ if [ -f "$LOCKFILE" ]; then
 
 else
   echo "$(date)|INFO|Lock file not found. Continuing." >> "$LOGFILE"
+  echo $(date)"|INFO|Start building playlist: $PLAYLIST" >> $LOGFILE
+  echo $(date)"|INFO|Using video path: $VIDEOS" >> $LOGFILE
 
   # create lock file
   echo 'This file should not exist for more than a few minutes.' > "$LOCKFILE"
 
   # create file listing of all videos (omit base path)
+  echo "$(date)|INFO|Getting file names all videos on disk into temp file (OUTFILE1)." >> "$LOGFILE"
   find -L "$VIDEOS" -type f \( -iname "*.*" ! -iname "*.txt" ! -iname "*.srt" ! -iname "*.jpg" ! -iname "*.nfo" ! -iname "*.tbn" \) > $OUTFILE1
 
   # output 1000 rows of videos in random order to new file
-  awk 'BEGIN{srand(); }
+  echo "$(date)|INFO|Pulling 1000 random lines from temp file (OUTFILE1)." >> "$LOGFILE"
+  awk -v seed=$RANDOM 'BEGIN{srand(seed); }
   { a[NR]=$0 }
   END{
     for(i=1; i<=1000; i++){
@@ -59,14 +71,19 @@ else
   LINES=$(wc -l < "$PLAYLIST")
   echo "$(date)|INFO|Created playlist containing $LINES lines." >> "$LOGFILE"
 
+
   # delete temp files
+  echo $(date)"|INFO|Deleting temp files" >> $LOGFILE
   rm $OUTFILE1
   rm $OUTFILE2
 
   # delete lockfile
+  echo $(date)"|INFO|Deleting lock file" >> $LOGFILE
   rm $LOCKFILE
 
 fi
+
+echo "$(date)|INFO|Processing complete. Restoring file system separator" >> "$LOGFILE"
 
 # restore IFS
 IFS=$OLDIFS
