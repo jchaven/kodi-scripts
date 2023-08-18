@@ -49,10 +49,13 @@ if [ -f "$LOCKFILE" ]; then
 
 else    
   echo "$(date)|INFO|Lock file not found. Continuing." >> "$LOGFILE"
-  echo $(date)"|INFO|Start building playlist: $PLAYLIST" > $LOGFILE
+  echo $(date)"|INFO|Start building playlist: $PLAYLIST" >> $LOGFILE
+  echo $(date)"|INFO|Using video list: $VIDEO_LIST" >> $LOGFILE
+  echo $(date)"|INFO|Using bumper list: $BUMPER_LIST" >> $LOGFILE
+  echo $(date)"|INFO|Using video path: $VIDEO_PATH" >> $LOGFILE
   
   # create lock file
-  echo 'This file should not exist for more than a few minutes.' > "$LOCKFILE"
+  echo 'This file should not exist for more than a few minutes.' >> "$LOCKFILE"
 
   # delete old playlist
   echo $(date)"|INFO|Deleting old playlist file: $PLAYLIST" >> $LOGFILE
