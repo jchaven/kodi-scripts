@@ -16,21 +16,23 @@ OLDIFS=$IFS
 IFS='
 '
 
-FILECOUNT=0
-ROWCOUNT=0
-FILELIMIT=80    # number of loops (see Note above)
-VIDEOLIMIT=3    # number of videos to play between bumpers
+SCRIPT=`basename "$0"`      # get name of this script
+RUN_DATE=$(date +"%Y%m%d")  # save current date (YYYYMMDD)
 
 # file locations (from Kodi perspective)
+LOGFILE="/storage/temp/make-musicvideo-m3u_v2-$RUN_DATE.log"
+LOCKFILE="/storage/temp/make-musicvideo-m3u.lock"
 BUMPER_LIST="/storage/nas/media/admin/mtv_bumpers.txt"
 VIDEO_LIST="/storage/nas/media/admin/mtv_videos.txt"
 VIDEO_PATH="/storage/videos/mtv"
 NAS_PATH="/storage/nas/media/Everyone/Music Videos"
 OUTFILE="/storage/temp/musicvideo-work.txt"
 PLAYLIST="/storage/.kodi/userdata/playlists/video/Music Videos.m3u"
-LOGFILE="/storage/temp/make-musicvideo-m3u_v2.log"
-LOCKFILE="/storage/temp/make-musicvideo-m3u.lock"
-SCRIPT=`basename "$0"`                     # get name of this script
+
+FILECOUNT=0
+ROWCOUNT=0
+FILELIMIT=80    # number of loops (see Note above)
+VIDEOLIMIT=3    # number of videos to play between bumpers
 
 
 #------------------------------------------------------------------
@@ -61,11 +63,15 @@ else
 
   # count number of files in video path
   FILE_COUNT=$(ls -1 "$VIDEO_PATH" | wc -l)
-  echo $(date)"|INFO|Number of files before processing: $FILE_COUNT" >> $LOGFILE
+  echo $(date)"|INFO|Number of files in local folder: $FILE_COUNT" >> $LOGFILE
 
   # copying new files from NAS to local disk
-  echo $(date)"|INFO|Copying new files from NAS to "$VIDEO_PATH": $PLAYLIST" >> $LOGFILE
+  echo $(date)"|INFO|Copying new files from NAS to: $VIDEO_PATH" >> $LOGFILE
   cp -u "$NAS_PATH"/* $VIDEO_PATH
+
+  # count number of files in video path
+  FILE_COUNT=$(ls -1 "$VIDEO_PATH" | wc -l)
+  echo $(date)"|INFO|Number of files in local folder: $FILE_COUNT" >> $LOGFILE
 
   # delete old playlist
   echo $(date)"|INFO|Deleting old playlist file: $PLAYLIST" >> $LOGFILE
@@ -132,11 +138,6 @@ else
   # get number of lines in playlist
   LINES=$(wc -l < "$PLAYLIST")
   echo "$(date)|INFO|Created playlist containing $LINES lines." >> "$LOGFILE"
-
-  # count number of files in video path
-  FILE_COUNT=$(ls -1 "$VIDEO_PATH" | wc -l)
-  echo $(date)"|INFO|Number of files after processing: $FILE_COUNT" >> $LOGFILE
-
 
   # delete temp files
   echo $(date)"|INFO|Deleting temp file: $OUTFILE" >> $LOGFILE
