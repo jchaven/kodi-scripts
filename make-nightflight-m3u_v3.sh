@@ -17,9 +17,10 @@ PLAYLIST="/storage/.kodi/userdata/playlists/video/Night Flight.m3u"
 VIDEOS="/storage/nas/media/Other/Night Flight"
 OUTFILE1="/storage/temp/nightflight-listing.txt"
 OUTFILE2="/storage/temp/nightflight-random.txt"
-LOGFILE="/storage/temp/make-nightflight-m3u_v3.log"
 LOCKFILE="/storage/temp/make-nightflight-m3u_v3.lock"
 SCRIPT=`basename "$0"`                     # get name of this script
+LOG_DATE=$(date +"%Y%m")  # save current date (YYYYMM)
+LOGFILE="/storage/temp/make-nightflight-m3u_v3-$LOG_DATE.log"
 
 
 #------------------------------------------------------------------

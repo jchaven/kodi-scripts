@@ -15,9 +15,11 @@ PLAYLIST="/storage/.kodi/userdata/playlists/video/Home and Garden.m3u"
 OUTFILE0="/storage/temp/homegarden-work.txt"
 OUTFILE1="/storage/temp/homegarden-listing.txt"
 OUTFILE2="/storage/temp/homegarden-random.txt"
-LOGFILE="/storage/temp/make-homegarden-m3u_v1.log"
 LOCKFILE="/storage/temp/make-homegarden-m3u_v1.lock"
 SCRIPT=`basename "$0"`                     # get name of this script
+LOG_DATE=$(date +"%Y%m")  # save current date (YYYYMM)
+LOGFILE="/storage/temp/make-homegarden-m3u_v1-$LOG_DATE.log"
+
 
 #------------------------------------------------------------------
 # FUNCTIONS
