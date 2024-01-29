@@ -71,6 +71,7 @@ else
   GetVideos "/storage/nas/media/Other/Home and Garden/Big Dreams Small Spaces"
   GetVideos "/storage/nas/media/Other/Home and Garden/Gardeners' World"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs Australia"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs New Zealand"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grow Your Own at Home"
   GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Garden"
