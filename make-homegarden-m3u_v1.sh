@@ -68,24 +68,29 @@ else
   # START PROCESSING
   echo "$(date)|INFO|Building a list of all videos in specific directories" >> "$LOGFILE"
   # create single list of all videos in specific folders (array not supported)
+  GetVideos "/storage/nas/media/Other/Home and Garden/Beachfront Bargain Hunt"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Beachfront Bargain Hunt - Renovation"
   GetVideos "/storage/nas/media/Other/Home and Garden/Big Dreams Small Spaces"
   GetVideos "/storage/nas/media/Other/Home and Garden/Gardeners' World"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs"
+  #GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs - The Streets"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs Australia"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs New Zealand"
   GetVideos "/storage/nas/media/Other/Home and Garden/Grow Your Own at Home"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Garden"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Gardeners' World"
   GetVideos "/storage/nas/media/Other/Home and Garden/Homegrown"
+  GetVideos "/storage/nas/media/Other/Home and Garden/House Hunters International"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Kill Your Lawn"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Garden"
   GetVideos "/storage/nas/media/Other/Home and Garden/Love Your Home and Garden"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Monty Don's Gardens"
+  GetVideos "/storage/nas/media/Other/Home and Garden/My Yard Goes Disney"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Queer Eye"
   GetVideos "/storage/nas/media/Other/Home and Garden/This Old House"
   GetVideos "/storage/nas/media/Other/Home and Garden/Tiny Houses"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Monty Don's Gardens"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Various Design"  
-  #GetVideos "/storage/nas/media/Other/Home and Garden/Grand Designs - The Streets"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Queer Eye"
-  GetVideos "/storage/nas/media/Other/Home and Garden/My Yard Goes Disney"
-  GetVideos "/storage/nas/media/Other/Home and Garden/Kill Your Lawn"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Trading Spaces"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Various Design"
+  GetVideos "/storage/nas/media/Other/Home and Garden/Wanted in Paradise"
+
 
   # get number of lines in outfile
   LINES=$(wc -l < "$OUTFILE1")
