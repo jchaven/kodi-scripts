@@ -66,7 +66,7 @@ if [ -f "$LOCKFILE" ]; then
   echo "$(date)|INFO|Lock file contains $LINES lines." >> "$LOGFILE"
   if [ $LINES -gt 5 ]; then
 
-    TELEGRAM_MESSAGE="XBMC-2308: Error creating M3U playlist. Lock file exists."
+    TELEGRAM_MESSAGE="XBMC-2405: Error creating M3U playlist. Lock file exists."
     curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="$TELEGRAM_MESSAGE" > /dev/null
 
   fi
@@ -89,7 +89,7 @@ if [ ! -f "$VIDEO_LIST" ]; then
   if [ $LINES -gt 1 ]; then
 
     echo $(date)"|INFO|Sending Telegram alert. Continuing." >> $LOGFILE
-    TELEGRAM_MESSAGE="XBMC-2308: Error creating M3U playlist. Source files missing."
+    TELEGRAM_MESSAGE="XBMC-2405: Error creating M3U playlist. Source files missing."
     curl -s -X POST https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage -d chat_id=$TELEGRAM_CHAT_ID -d text="$TELEGRAM_MESSAGE" > /dev/null
 
   fi
