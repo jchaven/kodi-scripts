@@ -17,8 +17,20 @@ OLDIFS=$IFS
 IFS='
 '
 
+#------------------------------------------------------------------
+# VARIABLES
+#------------------------------------------------------------------
 SCRIPT=`basename "$0"`      # get name of this script
 RUN_DATE=$(date +"%Y%m%d")  # save current date (YYYYMMDD)
+FILECOUNT=0
+ROWCOUNT=0
+FILELIMIT=80                # number of loops (see Note above)
+VIDEOLIMIT=3                # number of videos to play between bumpers
+MODULONUM=4                 # modulo to pull favorites
+
+# use for alerts
+TELEGRAM_TOKEN=$(cat /storage/scripts/TELEGRAM_TOKEN)
+TELEGRAM_CHAT_ID=$(cat /storage/scripts/TELEGRAM_CHATID)
 
 # file locations (from Kodi perspective)
 LOGFILE="/storage/temp/$SCRIPT-$RUN_DATE.log"
@@ -32,14 +44,6 @@ NAS_PATH="/storage/nas/media/Everyone/Music Videos"
 OUTFILE="/storage/temp/musicvideo-work.txt"
 PLAYLIST="/storage/.kodi/userdata/playlists/video/Music Videos.m3u"
 
-FILECOUNT=0
-ROWCOUNT=0
-FILELIMIT=80    # number of loops (see Note above)
-VIDEOLIMIT=3    # number of videos to play between bumpers
-MODULONUM=4     # modulo to pull favorites
-
-TELEGRAM_TOKEN=$(cat /storage/scripts/TELEGRAM_TOKEN)
-TELEGRAM_CHAT_ID=$(cat /storage/scripts/TELEGRAM_CHATID)
 
 #------------------------------------------------------------------
 # FUNCTIONS
