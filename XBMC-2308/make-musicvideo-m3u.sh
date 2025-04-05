@@ -17,20 +17,8 @@ OLDIFS=$IFS
 IFS='
 '
 
-#------------------------------------------------------------------
-# VARIABLES
-#------------------------------------------------------------------
 SCRIPT=`basename "$0"`      # get name of this script
 RUN_DATE=$(date +"%Y%m%d")  # save current date (YYYYMMDD)
-FILECOUNT=0
-ROWCOUNT=0
-FILELIMIT=80                # number of loops (see Note above)
-VIDEOLIMIT=3                # number of videos to play between bumpers
-MODULONUM=4                 # modulo to pull favorites
-
-# use for alerts
-TELEGRAM_TOKEN=$(cat /storage/scripts/TELEGRAM_TOKEN)
-TELEGRAM_CHAT_ID=$(cat /storage/scripts/TELEGRAM_CHATID)
 
 # file locations (from Kodi perspective)
 LOGFILE="/storage/temp/$SCRIPT-$RUN_DATE.log"
@@ -42,8 +30,16 @@ FAVORITE_LIST="/storage/nas/media/admin/mtv_favorites.txt"
 VIDEO_PATH="/storage/videos/mtv"
 NAS_PATH="/storage/nas/media/Everyone/Music Videos"
 OUTFILE="/storage/temp/musicvideo-work.txt"
+RANDOMFILE="/storage/temp/random-work.txt"
 PLAYLIST="/storage/.kodi/userdata/playlists/video/Music Videos.m3u"
 
+FILECOUNT=0
+ROWCOUNT=0
+FILELIMIT=80    # number of loops (see Note above)
+VIDEOLIMIT=3    # number of videos to play between bumpers
+
+TELEGRAM_TOKEN=$(cat /storage/scripts/TELEGRAM_TOKEN)
+TELEGRAM_CHAT_ID=$(cat /storage/scripts/TELEGRAM_CHATID)
 
 #------------------------------------------------------------------
 # FUNCTIONS
@@ -134,6 +130,25 @@ FILE_COUNT=$(ls -1 "$VIDEO_PATH" | wc -l)
 echo $(date)"|INFO|Number of files in local folder: $FILE_COUNT" >> $LOGFILE
 
 # start creating new playlist
+echo $(date)"|INFO|Ransomizing source files into single work file" >> $LOGFILE
+
+# randomize all source files before starting - it seems the same few files
+# keep getting "randomly" selected by this script. This will attempt to stop that.
+
+# First randomize the main list of music videos into a new file
+awk 'BEGIN {srand()} {print rand(), $0}' $VIDEO_LIST | sort -n | cut -d ' ' -f2- > $RANDOMFILE
+
+# Then randomize the music video favorites into same file (append) - run twice = more favorites
+awk 'BEGIN {srand()} {print rand(), $0}' $FAVORITE_LIST | sort -n | cut -d ' ' -f2- >> $RANDOMFILE
+sleep 3
+awk 'BEGIN {srand()} {print rand(), $0}' $FAVORITE_LIST | sort -n | cut -d ' ' -f2- >> $RANDOMFILE
+
+# reshuffle the randomized file even more
+awk 'BEGIN {srand()} {print rand(), $0}' $RANDOMFILE | sort -n | cut -d ' ' -f2- > $RANDOMFILE.1
+awk 'BEGIN {srand()} {print rand(), $0}' $RANDOMFILE.1 | sort -n | cut -d ' ' -f2- > $RANDOMFILE
+rm $RANDOMFILE.1
+
+
 while [  $FILECOUNT -lt $FILELIMIT ]; do
   #echo $(date)"|INFO|File count: "$FILECOUNT >> $LOGFILE
 
@@ -152,21 +167,19 @@ while [  $FILECOUNT -lt $FILELIMIT ]; do
   echo $(date)"|INFO|Adding bumper: $a" >> $LOGFILE
   echo $VIDEO_PATH/$a >> $OUTFILE
 
-
   # get multiple random lines from file list
   #shuf -n $VIDEOLIMIT $VIDEOS >> $OUTFILE
   # "shuf" not supported in LibreElec - use awk 3x in while loop
-  while [  $ROWCOUNT -lt $VIDEOLIMIT ]; do
-  #echo $(date)"|INFO|Row count: "$ROWCOUNT >> $LOGFILE
   #for i in {1..$VIDEOLIMIT}
   #do
+  while [  $ROWCOUNT -lt $VIDEOLIMIT ]; do
       # get single random line from file list
       a=$(awk -v seed=$RANDOM '
       BEGIN{ srand(seed) }
       rand() * NR < 1 {
           line = $0
       }
-      END { print line }' $VIDEO_LIST)
+      END { print line }' $RANDOMFILE)
 
       # add entry to playlist
       echo $(date)"|INFO|Adding music video: $a" >> $LOGFILE
@@ -174,25 +187,9 @@ while [  $FILECOUNT -lt $FILELIMIT ]; do
 
       # increment file limit counter
       let ROWCOUNT=ROWCOUNT+1
+      #echo $(date)"|INFO|Row count: "$ROWCOUNT >> $LOGFILE
 
   done
-
-  # pull video from favorites list
-  if [ $((FILECOUNT % MODULONUM)) -eq 0 ]; then
-
-      # get single random line from file list
-      a=$(awk -v seed=$RANDOM '
-      BEGIN{ srand(seed) }
-      rand() * NR < 1 {
-          line = $0
-      }
-      END { print line }' $FAVORITE_LIST)
-
-      # add entry to playlist
-      echo $(date)"|INFO|Adding favorite video: $a" >> $LOGFILE
-      echo $VIDEO_PATH/$a >> $OUTFILE
-
-  fi
 
   # reset row counter
   ROWCOUNT=0
@@ -219,6 +216,8 @@ echo "$(date)|INFO|Created playlist containing $LINES lines." >> "$LOGFILE"
 # delete temp files
 echo $(date)"|INFO|Deleting temp file: $OUTFILE" >> $LOGFILE
 rm $OUTFILE
+echo $(date)"|INFO|Deleting random video work file: $RANDOMFILE" >> $LOGFILE
+rm $RANDOMFILE
 echo $(date)"|INFO|Deleting lock file: $LOCKFILE" >> $LOGFILE
 rm $LOCKFILE
 
